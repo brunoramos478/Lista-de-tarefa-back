@@ -2,6 +2,7 @@ package com.bruno.gerenciador.de.tarefas.controller;
 
 import com.bruno.gerenciador.de.tarefas.entity.TaskEntity;
 import com.bruno.gerenciador.de.tarefas.services.TaskServices;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,12 +41,14 @@ public class TaskController {
     @GetMapping("listartarefa")
     public ResponseEntity<List<TaskEntity>> listarTarefa(@RequestParam (required = false)Boolean concluida) {
         List<TaskEntity> todas = taskServices.findAll();
-
         List<TaskEntity> filtro = (concluida == null)
                 ? todas
                 : todas.stream()
                        .filter( taskEntity -> Boolean.valueOf(taskEntity.isCompleted()).equals(concluida))
                        .collect(Collectors.toList());
+        if (filtro.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.valueOf(200)).body(null);
+        }
         return ResponseEntity.ok(filtro);
     }
 }
